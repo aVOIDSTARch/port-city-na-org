@@ -1,0 +1,51 @@
+# Project Plan 8.0 - Fix Homegroup Filtering
+
+## Table of Contents
+- [Project Plan 8.0 - Fix Homegroup Filtering](#project-plan-80---fix-homegroup-filtering)
+  - [Goal Description](#goal-description)
+  - [Proposed Changes](#proposed-changes)
+    - [Types](#types)
+    - [Services](#services)
+    - [Server Logic](#server-logic)
+    - [UI Logic](#ui-logic)
+  - [Verification Plan](#verification-plan)
+
+## Goal Description
+Fix the Homegroup filtering on the `/homegroups` page by correctly populating `areaId` and `regionId` on `HomeGroup` objects.
+
+## Proposed Changes
+
+### Types
+
+#### [MODIFY] [src/types/bmlt.ts](file:///Users/louisc/my-progs/websites/port-city-na-org/src/types/bmlt.ts)
+- **`Meeting`**: Add `serviceBodyId: string`.
+- **`HomeGroup`**: Add `regionId: string`.
+
+### Services
+
+#### [MODIFY] [src/services/bmlt.ts](file:///Users/louisc/my-progs/websites/port-city-na-org/src/services/bmlt.ts)
+- **`normalizeMeeting`**: Map `service_body_bigint` to `serviceBodyId`.
+
+### Server Logic
+
+#### [MODIFY] [src/server/bmlt.ts](file:///Users/louisc/my-progs/websites/port-city-na-org/src/server/bmlt.ts)
+- **`getHomeGroups`**:
+    - Fetch `getServiceBodies` (cached) alongside meetings.
+    - Create a map of Service Bodies for hierarchy lookup (ID -> Body).
+    - For each group:
+        - Get `areaId` from the first meeting's `serviceBodyId`.
+        - Look up `areaId` to find `parent_id` (Region ID).
+        - Assign `areaId` and `regionId` to the `HomeGroup`.
+
+### UI Logic
+
+#### [MODIFY] [src/routes/homegroups/index.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/routes/homegroups/index.tsx)
+- Enable filtering logic in `displayedGroups`.
+- `return all.filter(g => g.areaId === selectedAreaId() || g.regionId === selectedAreaId())`.
+- This allows the dropdown (which contains both Areas and Regions) to filter correctly.
+
+## Verification Plan
+
+### Manual Verification
+1.  **Homegroups Page**: Select "Port City Area". Verify only Port City groups show.
+2.  **Filter**: Select a diferent Area (if available) or Region. Verify list updates.

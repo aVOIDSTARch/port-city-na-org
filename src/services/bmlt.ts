@@ -6,6 +6,8 @@ export const normalizeMeeting = (bmltMeeting: BMLTMeeting): Meeting => {
   return {
     id: bmltMeeting.id_bigint,
     name: bmltMeeting.meeting_name,
+    serviceBodyId: bmltMeeting.service_body_bigint,
+    regionId: "0", // Will be populated by server enrichment
     day: parseInt(bmltMeeting.weekday_tinyint, 10),
     time: bmltMeeting.start_time,
     latitude: parseFloat(bmltMeeting.latitude),

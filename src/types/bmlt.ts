@@ -57,6 +57,8 @@ export interface BMLTMeeting {
 export interface Meeting {
   id: string;
   name: string;
+  serviceBodyId: string; // The immediate Service Body (Area)
+  regionId: string;      // The parent Service Body (Region)
   day: number; // 0-6? BMLT says tinyint, usually 1=Sunday or similar. Need to verify.
   time: string;
   latitude: number;
@@ -82,5 +84,6 @@ export interface HomeGroup {
   name: string;
   slug: string;
   areaId: string; // The service body ID this group belongs to (inferred from first meeting)
+  regionId: string; // The parent region ID
   meetings: Meeting[];
 }

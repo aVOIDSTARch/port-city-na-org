@@ -30,6 +30,20 @@ async function fetchJson<T>(url: string): Promise<T> {
     return fetchJsonCached(url, 0); 
 }
 
+// Helper to enrich meeting with Region ID
+function enrichMeeting(meeting: Meeting, bodyMap: Map<string, BMLTServiceBody>) {
+    const area = bodyMap.get(meeting.serviceBodyId);
+    if (area) {
+        // meeting.areaId is already meeting.serviceBodyId
+        // Find Region (Parent)
+        const region = bodyMap.get(area.parent_id);
+        if (region) {
+            meeting.regionId = region.id;
+        }
+    }
+    return meeting;
+}
+
 export const getServerInfo = query(async () => {
   "use server";
   const url = `${BMLT_ROOT_URL}?switcher=GetServerInfo`;
@@ -40,10 +54,16 @@ export const getServerInfo = query(async () => {
 
 export const getMeetings = query(async () => {
   "use server";
+  // 1. Fetch Bodies for enrichment
+  const bodiesUrl = `${BMLT_ROOT_URL}?switcher=GetServiceBodies`;
+  const bodiesData = await fetchJsonCached<BMLTServiceBody[]>(bodiesUrl, 3600);
+  const bodyMap = new Map(bodiesData.map(b => [b.id, b]));
+
+  // 2. Fetch Meetings
   const url = `${BMLT_ROOT_URL}?switcher=GetSearchResults`;
-  // Cache Meetings for 10 minutes (600s)
   const data = await fetchJsonCached<BMLTMeeting[]>(url, 600);
-  return data.map(normalizeMeeting);
+  
+  return data.map(m => enrichMeeting(normalizeMeeting(m), bodyMap));
 }, "getMeetings");
 
 export const getServiceBodies = query(async () => {
@@ -51,34 +71,33 @@ export const getServiceBodies = query(async () => {
     const url = `${BMLT_ROOT_URL}?switcher=GetServiceBodies`;
     // Cache Service Bodies for 1 hour
     const data = await fetchJsonCached<BMLTServiceBody[]>(url, 3600);
-    // BMLT returns all, we might want to filter or organize them later. 
-    // For now, return the raw list.
     return data;
 }, "getServiceBodies");
 
 export const getHomeGroups = query(async (areaId?: string) => {
     "use server";
-    // Reuse cached meetings if possible, or just hit the cache url
+    
+    // 1. Fetch Bodies for enrichment
+    const bodiesUrl = `${BMLT_ROOT_URL}?switcher=GetServiceBodies`;
+    const bodiesData = await fetchJsonCached<BMLTServiceBody[]>(bodiesUrl, 3600);
+    const bodyMap = new Map(bodiesData.map(b => [b.id, b]));
+
+    // 2. Fetch Meetings
     const url = `${BMLT_ROOT_URL}?switcher=GetSearchResults`;
     const data = await fetchJsonCached<BMLTMeeting[]>(url, 600);
-    const meetings = data.map(normalizeMeeting);
+    const meetings = data.map(m => enrichMeeting(normalizeMeeting(m), bodyMap));
 
-    // 2. Group by Name to form "Homegroups"
+    // 3. Group by Name to form "Homegroups"
     const groups: Record<string, HomeGroup> = {};
 
-    meetings.forEach((meeting, index) => {
-        // Warning: BMLT meetings are singular events. We group by exact meeting name.
-        // This might need Fuzzy matching in the future, but exact name is standard convention.
+    meetings.forEach((meeting) => {
         const name = meeting.name;
         if (!groups[name]) {
-            // Find the original BMLT object to get service_body_bigint if possible.
-            // But we already normalized it. We might need to add service_body_id to Meeting interface if we really need it.
-            // For now, let's assume we can pass area filtering later.
-            
             groups[name] = {
                 name: name,
                 slug: toSlug(name),
-                areaId: "0", // Accessing this from normalized data would require updating Meeting interface. Skip for MVP Preview.
+                areaId: meeting.serviceBodyId, // Capture Area from first meeting
+                regionId: meeting.regionId,   // Capture Region from first meeting
                 meetings: []
             };
         }
