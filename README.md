@@ -1,2 +1,10 @@
-# port-city-na-org
-website that uses a BMLT server to provide meeting schedule information and &lt;more will be revealed>
+# [project-title]
+
+## Project Information
+
+- Project Author(s) [authors]
+- Creation Date [created-on]
+- Purpose of Project [purpose]
+- Primary Coding Language [lang]
+- Github Repository URL [repo-url]
+

@@ -1,0 +1,30 @@
+## This file contains the ideas for this specific project
+
+# Requirements
+
+1. Should work with any BMLT by setting up the server information 
+2. Should use the api-mapper for the project
+3. Each homegroup should have a page
+4. Should have a page robust and efficient search page
+5. Should allow users to store a cookie that keeps track of their home location/area and uses it to load the main schedule viewer page when they visit
+6. Needs to be able to produce calendar event objects for download that can be used in Google, outlook, and Apple 
+7. Should have a subscription producing events calendar and/or celebration calendar based on selectable level of structure (area, region, etc)
+8. Top-line aesthetics
+9. Accessibility first
+10. Cognitive load driven design
+    1. Color coded days of the week
+    2. Focused emphasis on important data
+    3. Aria-enabled DOM 
+11. Hopefully use open maps for free
+
+# Home Group Page Details
+
+1. Have individual meeting cards
+2. A mini map 
+
+# Desirable Upgrades
+
+1. Email server that sends daily calendar digests based on area selected
+2. Use email to create user. 
+    1. Login via emailed code - no password 
+3. Send to map app on mobile for meetings
