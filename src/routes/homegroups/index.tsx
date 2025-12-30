@@ -46,15 +46,14 @@ export default function HomeGroups() {
 
   const displayedGroups = createMemo(() => {
     const all = homeGroups();
-    if (!all) return [];
-    
-    // In a real implementation with valid area IDs in HomeGroup:
-    // return all.filter(g => g.areaId === selectedAreaId());
-    
-    // For MVP/Mock: Since we don't effectively have Area IDs in the HomeGroup objects yet
-    // (BMLT Meeting normalization didn't include service_body_bigint), we show all.
-    // However, if we DID, this is where it would happen.
-    return all;
+    const selected = selectedAreaId();
+    if (!all || !Array.isArray(all)) return [];
+    if (!selected) return all;
+
+    return all.filter(g => 
+        g.areaId === selected || 
+        g.regionId === selected
+    );
   });
 
   return (

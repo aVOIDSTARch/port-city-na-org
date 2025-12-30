@@ -1,0 +1,46 @@
+# Project Plan 9.0 - Background Data Sync
+
+## Table of Contents
+- [Project Plan 9.0 - Background Data Sync](#project-plan-90---background-data-sync)
+  - [Goal Description](#goal-description)
+  - [Proposed Changes](#proposed-changes)
+    - [Server Store](#server-store)
+    - [Architecture Updates](#architecture-updates)
+  - [Verification Plan](#verification-plan)
+
+## Goal Description
+Implement a server-side background process that:
+1.  Loads all BMLT data (Meetings, Service Bodies) on startup.
+2.  Polls a "Changes Endpoint" (`switcher=GetChanges`) every 15 minutes.
+3.  If changes are detected, re-fetches the full dataset and updates the internal "reactive" model (Store).
+4.  Serves `getMeetings` and `getServiceBodies` instantly from this in-memory store.
+
+## Proposed Changes
+
+### Server Store
+
+#### [NEW] [src/server/store.ts](file:///Users/louisc/my-progs/websites/port-city-na-org/src/server/store.ts)
+- **`BMLTStore` Class/Module**:
+    - State: `meetings` (Signal/Store), `serviceBodies`, `homeGroups`.
+    - `lastSync`: timestamp.
+    - `initialize()`: Starts the 15-minute interval.
+    - `sync()`:
+        - Checks `GetChanges` (with `start_date` = last successfully synced date).
+        - If changes (or first run): Call `GetSearchResults` + `GetServiceBodies`, Enrich data, Update State.
+
+### Architecture Updates
+
+#### [MODIFY] [src/server/bmlt.ts](file:///Users/louisc/my-progs/websites/port-city-na-org/src/server/bmlt.ts)
+- **Remove** local simple cache logic.
+- **Import** `BMLTStore`.
+- **`getMeetings`**: Call `BMLTStore.getMeetings()`.
+- **`getServiceBodies`**: Call `BMLTStore.getServiceBodies()`.
+- **`getHomeGroups`**: Call `BMLTStore.getHomeGroups()`.
+- **Initialization**: Call `BMLTStore.ensureInitialized()` at the start of these functions (lazy init).
+
+## Verification Plan
+
+### Manual Verification
+1.  **Startup**: Run `npm run dev`. Load home page. Verify data loads (Store initialized).
+2.  **Performance**: Refresh page. Should be instant (served from memory).
+3.  **Logs**: Check console for "Initial Sync" and "Polling for changes..." messages.

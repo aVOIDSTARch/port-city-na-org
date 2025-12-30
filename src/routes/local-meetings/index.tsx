@@ -1,33 +1,45 @@
 import { createAsync } from "@solidjs/router";
 import { Title, Meta } from "@solidjs/meta";
-import { createSignal, createMemo, Show, Suspense } from "solid-js";
-import { getMeetings, getServerInfo } from "~/server/bmlt";
+import { createSignal, createMemo, Show, Suspense, For } from "solid-js";
+import { getMeetings, getServerInfo, getServiceBodies } from "~/server/bmlt";
 import ThisWeek from "~/components/ThisWeek";
 import { calculateDistance } from "~/services/location";
 
 export default function LocalMeetings() {
   const meetingsData = createAsync(() => getMeetings());
   const serverInfo = createAsync(() => getServerInfo());
+  const serviceBodies = createAsync(() => getServiceBodies());
 
   // Filter States
   const [radius, setRadius] = createSignal(50);
-  const [selectedArea, setSelectedArea] = createSignal("Port City Area");
 
-  // Filtering Logic
+  // Filtering Logic - Distance only for now
   const filteredMeetings = createMemo(() => {
     const all = meetingsData();
     const info = serverInfo();
     
     if (!all || !info) return [];
+    
+    console.log('[LocalMeetings] Total meetings loaded:', all.length);
+    
+    // Debug: show sample meeting structure
+    if (all.length > 0) {
+        console.log('[LocalMeetings] Sample meeting:', all[0]);
+    }
 
     // Default center from Server Info
     const centerLat = parseFloat(info.centerLatitude);
     const centerLng = parseFloat(info.centerLongitude);
+    
+    console.log('[LocalMeetings] Center point:', centerLat, centerLng, 'Radius:', radius());
 
-    return all.filter(meeting => {
+    const filtered = all.filter(meeting => {
         const dist = calculateDistance(centerLat, centerLng, meeting.latitude, meeting.longitude);
         return dist <= radius();
     });
+    
+    console.log('[LocalMeetings] After distance filter:', filtered.length, 'meetings');
+    return filtered;
   });
 
   return (
@@ -40,18 +52,6 @@ export default function LocalMeetings() {
                 <h1 class="text-xl font-bold text-brand-secondary">Local Meetings</h1>
                 
                 <div class="flex gap-4">
-                    {/* Area Select (Placeholder for now) */}
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm font-bold text-brand-text/70">Area:</label>
-                        <select
-                            value={selectedArea()}
-                            onChange={(e) => setSelectedArea(e.currentTarget.value)}
-                            class="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-brand-text/90 focus:outline-none focus:border-brand-secondary/50"
-                        >
-                            <option value="Port City Area">Port City Area</option>
-                        </select>
-                    </div>
-
                     {/* Radius Select */}
                     <div class="flex items-center gap-2">
                         <label class="text-sm font-bold text-brand-text/70">Distance:</label>
