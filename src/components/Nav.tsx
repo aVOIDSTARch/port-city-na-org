@@ -10,6 +10,12 @@ export default function Nav() {
         <li class={`border-b-2 ${active("/")} mx-1.5 sm:mx-6`}>
           <a href="/">Home</a>
         </li>
+        <li class={`border-b-2 ${active("/local-meetings")} mx-1.5 sm:mx-6`}>
+          <a href="/local-meetings">Local Meetings</a>
+        </li>
+        <li class={`border-b-2 ${active("/homegroups")} mx-1.5 sm:mx-6`}>
+            <a href="/homegroups">Our Homegroups</a>
+        </li>
         <li class={`border-b-2 ${active("/about")} mx-1.5 sm:mx-6`}>
           <a href="/about">About</a>
         </li>

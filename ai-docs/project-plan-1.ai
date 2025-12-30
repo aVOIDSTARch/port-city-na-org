@@ -1,0 +1,77 @@
+# Project Plan 1.0 - Initial Foundation
+
+## Table of Contents
+- [Project Plan 1.0 - Initial Foundation](#project-plan-10---initial-foundation)
+  - [Table of Contents](#table-of-contents)
+  - [Goal Description](#goal-description)
+  - [User Review Required](#user-review-required)
+  - [Proposed Changes](#proposed-changes)
+    - [Infrastructure & Config](#infrastructure--config)
+    - [BMLT Integration (The `api-mapper`)](#bmlt-integration-the-api-mapper)
+  - [Verification Plan](#verification-plan)
+    - [Automated Tests](#automated-tests)
+    - [Manual Verification](#manual-verification)
+
+## Goal Description
+This plan establishes the core infrastructure for the Port City NA website. We will set up the testing framework (Vitest), documentation tools (Typedoc), and the "API Mapper" service to interface with the BMLT JSON API. We will also perform a minor restructure to bring the app to the root level for better tooling compatibility and configure the design system tokens.
+
+## User Review Required
+> [!NOTE]
+> We will move the contents of `portcityna-org-app` to the root directory `.` to simplify imports and tooling.
+
+## Proposed Changes
+
+### Infrastructure & Config
+
+#### [MODIFY] [package.json](file:///Users/louisc/my-progs/websites/port-city-na-org/portcityna-org-app/package.json)
+- Add `vitest`, `jsdom`, `@solidjs/testing-library` to `devDependencies`.
+- Add `typedoc` to `devDependencies`.
+- Add `test` and `docs` scripts.
+
+#### [NEW] [vitest.config.ts](file:///Users/louisc/my-progs/websites/port-city-na-org/vitest.config.ts)
+- Configuration for running Unit tests with SolidJS support.
+
+#### [MODIFY] [app.css](file:///Users/louisc/my-progs/websites/port-city-na-org/portcityna-org-app/src/app.css)
+- Define CSS settings for Tailwind v4 theme (Colors, Fonts).
+- Add "Day of Week" color variables.
+- **[NEW]** Derive primary/secondary color palette from `public/charleston-bridge-hero-image.jpeg`.
+
+#### [NEW] [src/components/Hero.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/components/Hero.tsx)
+- Implement a responsive Hero component displaying the Charleston Bridge image.
+- Ensure text contrast and accessibility over the image.
+
+#### [NEW] [src/components/ThisWeek.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/components/ThisWeek.tsx)
+- **Purpose:** Reusable component to display meetings tabbed by day.
+- **Features:**
+    - Tabs for each day of the week (using the "Day of Weeks" color coding).
+    - Lists meetings for the selected day.
+    - Uses `MeetingInterface` data model.
+
+### BMLT Integration (The `api-mapper`)
+
+#### [NEW] [src/services/bmlt.ts](file:///Users/louisc/my-progs/websites/port-city-na-org/src/services/bmlt.ts)
+- **Purpose:** The "API Mapper" requested. Adapts BMLT JSON data into our app's domain models.
+- **Key Functions:**
+    - `fetchServerInfo()`: Gets root server info.
+    - `fetchMeetings()`: Gets meeting list.
+    - `normalizeMeeting()`: Transforms BMLT meeting object to internal schema (`MeetingInterface`).
+
+#### [NEW] [src/server/bmlt.ts](file:///Users/louisc/my-progs/websites/port-city-na-org/src/server/bmlt.ts)
+- **Purpose:** Server-side functions (SolidStart `server$`) to proxy requests to `bmlt.sezf.org`.
+- **Reason:** Prevents CORS, hides API details, allows caching.
+
+#### [NEW] [tests/bmlt.test.ts](file:///Users/louisc/my-progs/websites/port-city-na-org/tests/bmlt.test.ts)
+- Unit tests for the `normalizeMeeting` logic to ensure data is correctly parsed.
+
+## Verification Plan
+
+### Automated Tests
+Run the newly created test suite:
+```bash
+npm run test
+```
+*Expectation:* All tests for `bmlt.ts` service pass.
+
+### Manual Verification
+1.  **Build Check:** Run `npm run build` to ensure TypeDoc and Vitest packages don't conflict with the Vinxi build.
+2.  **Dev Server:** Run `npm run dev` and verify the app still loads (Checking that the root move didn't break imports).

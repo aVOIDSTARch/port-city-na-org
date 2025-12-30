@@ -1,20 +1,28 @@
 {
-  "name": "example-with-tailwindcss",
+  "name": "port-city-na",
   "type": "module",
   "scripts": {
     "dev": "vinxi dev",
     "build": "vinxi build",
-    "start": "vinxi start"
+    "start": "vinxi start",
+    "test": "vitest",
+    "docs": "typedoc"
   },
   "dependencies": {
+    "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.0",
     "@solidjs/start": "^1.1.0",
     "solid-js": "^1.9.5",
     "vinxi": "^0.5.7"
   },
   "devDependencies": {
+    "@solidjs/testing-library": "^0.8.0",
     "@tailwindcss/vite": "^4.0.7",
-    "tailwindcss": "^4.0.7"
+    "jsdom": "^23.0.1",
+    "tailwindcss": "^4.0.7",
+    "typedoc": "^0.25.4",
+    "vite-plugin-solid": "^2.11.10",
+    "vitest": "^1.1.0"
   },
   "engines": {
     "node": ">=22"

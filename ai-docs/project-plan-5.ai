@@ -1,0 +1,66 @@
+# Project Plan 5.0 - Homegroup Pages & Area Selection
+
+## Table of Contents
+- [Project Plan 5.0 - Homegroup Pages & Area Selection](#project-plan-50---homegroup-pages--area-selection)
+  - [Goal Description](#goal-description)
+  - [Proposed Changes](#proposed-changes)
+    - [Services & Types](#services--types)
+    - [Components](#components)
+    - [Routes](#routes)
+  - [Verification Plan](#verification-plan)
+
+## Goal Description
+Enhance the Homepage to allow users to select an "Area" (Service Body). Upon selection, display a grid of "Homegroup Preview Cards" for groups in that area. Clicking a card navigates to `/group/[slug]`, a dedicated page for that Homegroup showing its meeting schedule and details.
+
+## Proposed Changes
+
+### Services & Types
+
+#### [MODIFY] [src/types/bmlt.ts](file:///Users/louisc/my-progs/websites/port-city-na-org/src/types/bmlt.ts)
+- Add `BMLTServiceBody` interface.
+- Add `HomeGroup` interface (Derived from grouping meetings by name).
+
+#### [MODIFY] [src/server/bmlt.ts](file:///Users/louisc/my-progs/websites/port-city-na-org/src/server/bmlt.ts)
+- **`getServiceBodies()`**: Fetch list of Areas.
+- **`getHomeGroups(areaId?)`**: Helper to fetch meetings and group them by `meeting_name`.
+
+#### [NEW] [src/utils/slug.ts](file:///Users/louisc/my-progs/websites/port-city-na-org/src/utils/slug.ts)
+- **`toSlug(text)`**: Converts "My Group" to "my-group".
+- **`fromSlug(slug)`**: Note: Can't reliably reverse, so filtering will use `toSlug(meeting.name) === urlSlug`.
+
+### Components
+
+#### [NEW] [src/components/HomeGroupCard.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/components/HomeGroupCard.tsx)
+- Displays Group Name.
+- Shows "Next Meeting: [Time]" logic? (Bonus).
+- Links to `/group/[slug]`.
+
+#### [MODIFY] [src/routes/index.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/routes/index.tsx)
+- Add `AreaDropdown`.
+- Fetch `ServiceBodies`.
+- Display Grid of `HomeGroupCards`.
+
+### Routes
+
+#### [NEW] [src/routes/group/[slug].tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/routes/group/[slug].tsx)
+- **Path**: `/group/:slug`
+- **Logic**:
+    - Fetch all meetings.
+    - Filter meetings where `toSlug(name) === params.slug`.
+    - If no meetings found, 404.
+- **UI**:
+    - Group Name Header.
+    - "This Group's Schedule" (Re-use `MeetingCard` or list).
+    - Map (Leaflet) showing the venue(s).
+
+## Verification Plan
+
+### Manual Verification
+1.  **Homepage**:
+    - Verify Dropdown lists Areas.
+    - Select Area -> See Grid of Groups.
+2.  **Navigation**:
+    - Click Group Card -> Go to `/group/some-group-name`.
+3.  **Group Page**:
+    - Verify Title is correct.
+    - Verify only meetings for that group are shown.

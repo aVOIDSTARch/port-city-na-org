@@ -1,0 +1,62 @@
+# Project Plan 2.0 - Search & Discovery
+
+## Table of Contents
+- [Project Plan 2.0 - Search & Discovery](#project-plan-20---search--discovery)
+  - [Goal Description](#goal-description)
+  - [Proposed Changes](#proposed-changes)
+    - [Refactoring](#refactoring)
+    - [New Components](#new-components)
+    - [Routes](#routes)
+  - [Verification Plan](#verification-plan)
+
+## Goal Description
+Implement the "Robust and efficient search page" requirement. This involves creating a dedicated Search route with advanced filtering capabilities (Day, Time, Format, Location) and text search. We will also refactor the `MeetingCard` for reusability.
+
+## Proposed Changes
+
+### Refactoring
+
+#### [NEW] [src/components/MeetingCard.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/components/MeetingCard.tsx)
+- Extract the meeting card UI from `ThisWeek.tsx` into a reusable component.
+- **Props:** `meeting: Meeting`, `showDay?: boolean`.
+
+#### [MODIFY] [src/components/ThisWeek.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/components/ThisWeek.tsx)
+- Update to use the new `MeetingCard` component.
+
+### New Components
+
+#### [NEW] [src/components/FilterBar.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/components/FilterBar.tsx)
+- **Purpose:** Modular filter controls.
+- **Inputs:**
+    - Search Input (Text)
+    - Day Select
+    - City Select
+    - Format Multi-select
+
+#### [NEW] [src/components/MeetingList.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/components/MeetingList.tsx)
+- **Purpose:** A grid/list layout to display filtered results.
+
+### Routes
+
+#### [NEW] [src/routes/meetings/index.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/routes/meetings/index.tsx)
+- **Route:** `/meetings`
+- **Features:**
+    - SEO metadata for "Find a Meeting".
+    - Fetches *all* meetings (Server Function).
+    - Client-side filtering logic for instant responsiveness.
+    - Uses `FilterBar` and `MeetingList`.
+    - "No results" state.
+
+#### [MODIFY] [src/routes/index.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/routes/index.tsx)
+- Add a visible link/button to `/meetings` in the Hero or Nav.
+
+## Verification Plan
+
+### Automated Tests
+- Test `MeetingCard` rendering.
+- Test Filter logic (if extracted to a hook/utility).
+
+### Manual Verification
+- Verify Search route loads.
+- Test filters interactively (e.g., Select "Monday" -> Only see Monday meetings).
+- Verify "Text Search" matches meeting names or addresses.

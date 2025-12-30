@@ -1,0 +1,35 @@
+# Project Plan 6.0 - Performance Optimization
+
+## Table of Contents
+- [Project Plan 6.0 - Performance Optimization](#project-plan-60---performance-optimization)
+  - [Goal Description](#goal-description)
+  - [Proposed Changes](#proposed-changes)
+    - [Server Cache](#server-cache)
+    - [Assets](#assets)
+  - [Verification Plan](#verification-plan)
+
+## Goal Description
+Improve site loading speed by implementing server-side caching for BMLT API requests (reducing external network calls) and verifying asset optimizations.
+
+## Proposed Changes
+
+### Server Cache
+
+#### [MODIFY] [src/server/bmlt.ts](file:///Users/louisc/my-progs/websites/port-city-na-org/src/server/bmlt.ts)
+- Implement a simple in-memory cache with TTL (Time To Live).
+- **`fetchJsonCached(url, ttl)`**: Wrapper around `fetchJson`.
+- Cache Duration:
+    - Meetings: 5-15 minutes (Data doesn't change instantly).
+    - Server Info/Service Bodies: 1 hour.
+
+### Assets
+
+#### [CHECK] [public/charleston-bridge-hero-image.jpeg]
+- Verify file size. If huge (>500KB), recommend resizing or converting to WebP. (Since I can't resize binaries easily, I will just report if it's too big, or use `sharp` if configured, but better to just use a smaller image if available).
+- For now, the primary win is caching the API.
+
+## Verification Plan
+
+### Manual Verification
+1.  **API Speed**: Load page -> slow (first miss). Reload -> fast (cache hit).
+2.  **Logs**: Add console logs to `bmlt.ts` to show "CACHE HIT" vs "CACHE MISS".

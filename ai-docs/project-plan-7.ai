@@ -1,0 +1,34 @@
+# Project Plan 7.0 - UI Layout Updates (Wider Cards)
+
+## Table of Contents
+- [Project Plan 7.0 - UI Layout Updates (Wider Cards)](#project-plan-70---ui-layout-updates-wider-cards)
+  - [Goal Description](#goal-description)
+  - [Proposed Changes](#proposed-changes)
+    - [Components](#components)
+    - [Routes](#routes)
+  - [Verification Plan](#verification-plan)
+
+## Goal Description
+Update the layout of Meeting and Homegroup cards to be "single item per line" (full width) on Desktop and iPad, effectively making them wider and consistent with the mobile view.
+
+## Proposed Changes
+
+### Components
+
+#### [MODIFY] [src/components/MeetingList.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/components/MeetingList.tsx)
+- Change grid layout from `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` to `grid-cols-1`.
+
+#### [MODIFY] [src/components/ThisWeek.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/components/ThisWeek.tsx)
+- Change grid layout from `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` to `grid-cols-1`.
+
+### Routes
+
+#### [MODIFY] [src/routes/homegroups/index.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/routes/homegroups/index.tsx)
+- Change grid layout from `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` to `grid-cols-1`.
+
+## Verification Plan
+
+### Manual Verification
+1.  **Local Meetings**: Check `/local-meetings` (uses `ThisWeek`). Verify cards are full width on Desktop.
+2.  **Meetings Search**: Check `/meetings` (uses `MeetingList`). Verify cards are full width.
+3.  **Homegroups**: Check `/homegroups`. Verify cards are full width.

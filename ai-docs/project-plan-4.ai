@@ -1,0 +1,54 @@
+# Project Plan 4.0 - Local Meetings Page
+
+## Table of Contents
+- [Project Plan 4.0 - Local Meetings Page](#project-plan-40---local-meetings-page)
+  - [Goal Description](#goal-description)
+  - [Proposed Changes](#proposed-changes)
+    - [Routes](#routes)
+    - [Components](#components)
+  - [Verification Plan](#verification-plan)
+
+## Goal Description
+Move the "This Week" view (Tabbed by Day) from the Home Page to a dedicated `/local-meetings` page. This page will feature a top filter bar with "Area" and "Distance" dropdowns, defaulting to "Port City Area" (Server Center) and "50 Miles".
+
+## Proposed Changes
+
+### Routes
+
+#### [NEW] [src/routes/local-meetings/index.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/routes/local-meetings/index.tsx)
+- **Path**: `/local-meetings`
+- **Data Fetching**:
+    - `getMeetings()`: fetch all meetings.
+    - `getServerInfo()`: fetch server info to get `centerLatitude` and `centerLongitude` (defining "Port City Area").
+- **State**:
+    - `center`: Defaults to Server Info center.
+    - `radius`: Defaults to 50 miles.
+    - `selectedArea`: Defaults to "Port City Area".
+- **Logic**:
+    - Filter `allMeetings` by `radius` from `center`.
+    - Pass filtered meetings to `<ThisWeek />`.
+- **UI**:
+    - Top Bar:
+        - "Area" Dropdown: ["Port City Area"] (for now, unless Service Bodies are implemented).
+        - "Distance" Dropdown: [5, 10, 25, 50, 100]. Default 50.
+
+#### [MODIFY] [src/routes/index.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/routes/index.tsx)
+- Remove `<ThisWeek />`.
+- Keep `<Hero />`.
+- Maybe add a CTA in Hero explicitly pointing to `/local-meetings`? (Already existing standard CTA "Find a Meeting" usually points to search, maybe update it or leave as is).
+
+### Components
+
+#### [MODIFY] [src/components/Nav.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/components/Nav.tsx)
+- Add "Local Meetings" link pointing to `/local-meetings`.
+
+#### [MODIFY] [src/components/ThisWeek.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/components/ThisWeek.tsx)
+- Minor styling adjustments if needed to fit the new page layout (e.g. remove top margin if the filter bar handles spacing).
+
+## Verification Plan
+
+### Manual Verification
+1.  **Navigation**: Click "Local Meetings" in Nav.
+2.  **Default View**: Verify meetings are shown, defaults to 50 miles radius from Server Center.
+3.  **Filering**: Change radius to 5 miles. Verify meeting count/list changes.
+4.  **Home Page**: Verify "This Week" is gone.

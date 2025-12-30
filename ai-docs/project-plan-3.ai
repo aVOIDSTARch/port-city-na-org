@@ -1,0 +1,47 @@
+# Project Plan 3.0 - Geolocation Search
+
+## Table of Contents
+- [Project Plan 3.0 - Geolocation Search](#project-plan-30---geolocation-search)
+  - [Goal Description](#goal-description)
+  - [Proposed Changes](#proposed-changes)
+    - [Services](#services)
+    - [Components](#components)
+    - [Routes](#routes)
+  - [Verification Plan](#verification-plan)
+
+## Goal Description
+Allow users to find meetings near them. Users can either use their current device location or enter a Zip Code/Address. They can then filter meetings within a specific radius (5, 10, 15, 25, 50, 100 miles).
+
+## Proposed Changes
+
+### Services
+
+#### [NEW] [src/services/location.ts](file:///Users/louisc/my-progs/websites/port-city-na-org/src/services/location.ts)
+- **`getCurrentLocation()`**: Wraps browser `navigator.geolocation` API.
+- **`geocodeAddress(query: string)`**: Fetches coordinates from OpenStreetMap (Nominatim) API to support free "open maps" requirement.
+- **`calculateDistance(lat1, lon1, lat2, lon2)`**: Implements Haversine formula to return miles between two points.
+
+### Components
+
+#### [MODIFY] [src/components/FilterBar.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/components/FilterBar.tsx)
+- Add "Distance" Dropdown (5, 10, 25, 50, 100 mi).
+- Add "Location" Input group:
+    - Text Input (Zip/City).
+    - "Use My Location" Button (icon).
+
+### Routes
+
+#### [MODIFY] [src/routes/meetings/index.tsx](file:///Users/louisc/my-progs/websites/port-city-na-org/src/routes/meetings/index.tsx)
+- Add state for `searchLocation` `{ lat: number, lng: number } | null`.
+- Add state for `searchRadius` (default 25?).
+- Update `filteredMeetings` logic:
+    - If `searchLocation` is set, calculate distance for every meeting.
+    - Filter out meetings where `distance > searchRadius`.
+    - Sort results by distance (closest first) when location is active.
+
+## Verification Plan
+
+### Manual Verification
+1.  **Browser Location**: Click "Use My Location", verify meetings sort by distance.
+2.  **Zip Code**: Enter a known Zip Code (e.g., "28401"), verify coordinates are fetched and results filtered.
+3.  **Radius**: Change radius from 5mi to 100mi, verify list expands.
